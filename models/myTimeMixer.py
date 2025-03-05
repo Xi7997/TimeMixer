@@ -53,6 +53,9 @@ class MultiScaleSeasonMixing(nn.Module):
         )
 
     def forward(self, season_list):
+        # 只从第2层开始进行下采样
+        if len(season_list) > 2:
+            season_list = season_list[2:]
 
         # mixing high->low
         out_high = season_list[0]
@@ -95,6 +98,9 @@ class MultiScaleTrendMixing(nn.Module):
             ])
 
     def forward(self, trend_list):
+        # 只从第2层开始进行下采样
+        if len(trend_list) > 2:
+            trend_list = trend_list[2:]
 
         # mixing low->high
         trend_list_reverse = trend_list.copy()
