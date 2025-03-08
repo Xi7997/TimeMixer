@@ -33,7 +33,10 @@ class MultiScaleSeasonMixing(nn.Module):
 
     def __init__(self, configs):
         super(MultiScaleSeasonMixing, self).__init__()
-
+        # 三层
+        # Linear1 : T,C -> T/2,C
+        # Linear2 : GELU()
+        # Linear3 : T/2,C -> T/2,C
         self.down_sampling_layers = torch.nn.ModuleList(
             [
                 nn.Sequential(
@@ -338,11 +341,12 @@ class Model(nn.Module):
                 self.x_mark_dec = self.enc_embedding(None, x_mark_dec)
             else:
                 self.x_mark_dec = self.enc_embedding(None, x_mark_dec)
-
+        # 生成不同尺度的输入
         x_enc, x_mark_enc = self.__multi_scale_process_inputs(x_enc, x_mark_enc)
 
         x_list = []
         x_mark_list = []
+        # 对时间序列进行归一化
         if x_mark_enc is not None:
             for i, x, x_mark in zip(range(len(x_enc)), x_enc, x_mark_enc):
                 B, T, N = x.size()
@@ -372,7 +376,7 @@ class Model(nn.Module):
                 enc_out = self.enc_embedding(x, None)  # [B,T,C]
                 enc_out_list.append(enc_out)
 
-        # Past Decomposable Mixing as encoder for past
+        # Past Decomposable Mixing as encoder for past, 进入PDM模块
         for i in range(self.layer):
             enc_out_list = self.pdm_blocks[i](enc_out_list)
 
