@@ -34,9 +34,9 @@ class TimeMixer(nn.Module):
         # 多层降采样
         self.down_sampling_layers = nn.ModuleList([
             nn.Sequential(
-                nn.Linear(seq_len // (down_sampling_window ** i), seq_len // (down_sampling_window ** (i + 1))),
+                nn.Conv1d(in_channels=d_model, out_channels=d_model, kernel_size=2, stride=2),
                 nn.GELU(),
-                nn.Linear(seq_len // (down_sampling_window ** (i + 1)), seq_len // (down_sampling_window ** (i + 1))),
+                nn.Conv1d(in_channels=d_model, out_channels=d_model, kernel_size=1),
             )
             for i in range(down_sampling_layers)
         ])
@@ -97,9 +97,9 @@ class TimeMixer(nn.Module):
             for i,s in enumerate(X1_list):
                 print(f"after PastDecomposableMixing {i}: ", s.shape)
         #step3: 混合预测
-        # print("11111")
+
         y_pre = self.Predictor(X1_list)
-        # print("22222")
+
         if DEBUG:
             print("Y-pre: ", y_pre)
             print("after Predictor: ", y_pre.shape)
